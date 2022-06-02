@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `CustomGradientBar`: Fix insertion and control point positioning to more closely follow cursor. ([#41492](https://github.com/WordPress/gutenberg/pull/41492))
+
 ## 19.12.0 (2022-06-01)
 
 ### Bug Fix
