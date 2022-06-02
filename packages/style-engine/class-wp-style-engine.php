@@ -79,8 +79,8 @@ class WP_Style_Engine {
 		'border'     => array(
 			'color'  => array(
 				'property_keys' => array(
-					'default' => 'border-color',
-					'single'  => 'border-%s-color',
+					'default'    => 'border-color',
+					'individual' => 'border-%s-color',
 				),
 				'path'          => array( 'border', 'color' ),
 				'classnames'    => array(
@@ -90,48 +90,48 @@ class WP_Style_Engine {
 			),
 			'radius' => array(
 				'property_keys' => array(
-					'default' => 'border-radius',
-					'single'  => 'border-%s-radius',
+					'default'    => 'border-radius',
+					'individual' => 'border-%s-radius',
 				),
 				'path'          => array( 'border', 'radius' ),
 			),
 			'style'  => array(
 				'property_keys' => array(
-					'default' => 'border-style',
-					'single'  => 'border-%s-style',
+					'default'    => 'border-style',
+					'individual' => 'border-%s-style',
 				),
 				'path'          => array( 'border', 'style' ),
 			),
 			'width'  => array(
 				'property_keys' => array(
-					'default' => 'border-width',
-					'single'  => 'border-%s-width',
+					'default'    => 'border-width',
+					'individual' => 'border-%s-width',
 				),
 				'path'          => array( 'border', 'width' ),
 			),
 			'top'    => array(
-				'value_func' => 'static::get_css_single_property_rules',
+				'value_func' => 'static::get_css_individual_property_rules',
 				'path'       => array( 'border', 'top' ),
 				'css_vars'   => array(
 					'color' => '--wp--preset--color--$slug',
 				),
 			),
 			'right'  => array(
-				'value_func' => 'static::get_css_single_property_rules',
+				'value_func' => 'static::get_css_individual_property_rules',
 				'path'       => array( 'border', 'right' ),
 				'css_vars'   => array(
 					'color' => '--wp--preset--color--$slug',
 				),
 			),
 			'bottom' => array(
-				'value_func' => 'static::get_css_single_property_rules',
+				'value_func' => 'static::get_css_individual_property_rules',
 				'path'       => array( 'border', 'bottom' ),
 				'css_vars'   => array(
 					'color' => '--wp--preset--color--$slug',
 				),
 			),
 			'left'   => array(
-				'value_func' => 'static::get_css_single_property_rules',
+				'value_func' => 'static::get_css_individual_property_rules',
 				'path'       => array( 'border', 'left' ),
 				'css_vars'   => array(
 					'color' => '--wp--preset--color--$slug',
@@ -141,15 +141,15 @@ class WP_Style_Engine {
 		'spacing'    => array(
 			'padding' => array(
 				'property_keys' => array(
-					'default' => 'padding',
-					'single'  => 'padding-%s',
+					'default'    => 'padding',
+					'individual' => 'padding-%s',
 				),
 				'path'          => array( 'spacing', 'padding' ),
 			),
 			'margin'  => array(
 				'property_keys' => array(
-					'default' => 'margin',
-					'single'  => 'margin-%s',
+					'default'    => 'margin',
+					'individual' => 'margin-%s',
 				),
 				'path'          => array( 'spacing', 'margin' ),
 			),
@@ -308,7 +308,7 @@ class WP_Style_Engine {
 		// for styles such as margins and padding.
 		if ( is_array( $style_value ) ) {
 			foreach ( $style_value as $key => $value ) {
-				$side_property           = sprintf( $style_properties['single'], _wp_to_kebab_case( $key ) );
+				$side_property           = sprintf( $style_properties['individual'], _wp_to_kebab_case( $key ) );
 				$rules[ $side_property ] = $value;
 			}
 		} else {
@@ -382,28 +382,28 @@ class WP_Style_Engine {
 
 	/**
 	 * Style value parser that returns a CSS ruleset of style properties for style definition groups
-	 * that have keys representing single (or individual) style properties, otherwise known as longhand CSS properties.
+	 * that have keys representing individual style properties, otherwise known as longhand CSS properties.
 	 * e.g., "$style_property-$single_feature: $value;", which could represent the following:
 	 * "border-{top|right|bottom|left}-{color|width|style}: {value};" or,
 	 * "border-image-{outset|source|width|repeat|slice}: {value};"
 	 *
 	 * @param array $style_value             A single raw Gutenberg style attributes value for a CSS property.
-	 * @param array $single_style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+	 * @param array $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
 	 *
 	 * @return array The class name for the added style.
 	 */
-	protected static function get_css_single_property_rules( $style_value, $single_style_definition ) {
+	protected static function get_css_individual_property_rules( $style_value, $individual_property_definition ) {
 		$rules = array();
 
-		if ( ! is_array( $style_value ) || empty( $style_value ) || empty( $single_style_definition['path'] ) ) {
+		if ( ! is_array( $style_value ) || empty( $style_value ) || empty( $individual_property_definition['path'] ) ) {
 			return $rules;
 		}
 
-		// The first item in $single_style_definition['path'] array tells us the style property, e.g., "border".
+		// The first item in $individual_property_definition['path'] array tells us the style property, e.g., "border".
 		// We use this to get a corresponding CSS style definition such as "color" or "width" from the same group.
-		// The second item in $single_style_definition['path'] array refers to the side property, e.g., "top".
-		$definition_group_key = $single_style_definition['path'][0];
-		$single_property      = $single_style_definition['path'][1];
+		// The second item in $individual_property_definition['path'] array refers to the individual property marker, e.g., "top".
+		$definition_group_key    = $individual_property_definition['path'][0];
+		$individual_property_key = $individual_property_definition['path'][1];
 
 		foreach ( $style_value as $css_property => $value ) {
 			if ( empty( $value ) ) {
@@ -414,18 +414,18 @@ class WP_Style_Engine {
 			$style_definition_path = array( $definition_group_key, $css_property );
 			$style_definition      = _wp_array_get( self::BLOCK_STYLE_DEFINITIONS_METADATA, $style_definition_path, null );
 
-			if ( $style_definition && isset( $style_definition['property_keys']['single'] ) ) {
+			if ( $style_definition && isset( $style_definition['property_keys']['individual'] ) ) {
 				// Set a CSS var if there is a valid preset value.
-				$slug = isset( $single_style_definition['css_vars'][ $css_property ] ) ? static::get_slug_from_preset_value( $value, $css_property ) : null;
+				$slug = isset( $individual_property_definition['css_vars'][ $css_property ] ) ? static::get_slug_from_preset_value( $value, $css_property ) : null;
 				if ( $slug ) {
 					$css_var = strtr(
-						$single_style_definition['css_vars'][ $css_property ],
+						$individual_property_definition['css_vars'][ $css_property ],
 						array( '$slug' => $slug )
 					);
 					$value   = "var($css_var)";
 				}
-				$single_css_property           = sprintf( $style_definition['property_keys']['single'], $single_property );
-				$rules[ $single_css_property ] = $value;
+				$individual_css_property           = sprintf( $style_definition['property_keys']['individual'], $individual_property_key );
+				$rules[ $individual_css_property ] = $value;
 			}
 		}
 		return $rules;
