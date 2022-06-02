@@ -438,6 +438,11 @@ class WP_Style_Engine {
  * Returns an CSS ruleset.
  * Styles are bundled based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
  *
+ * Example usage:
+ *
+ * $styles = gutenberg_style_engine_generate( array( 'color' => array( 'text' => '#cccccc' ) ) );
+ * // Returns `'color: #cccccc'`.
+ *
  * @param array $block_styles An array of styles from a block's attributes.
  *
  * @return array|null array(
